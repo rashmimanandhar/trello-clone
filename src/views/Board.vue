@@ -1,21 +1,26 @@
 <template>
   <div class="board">
     <div class="flex flex-row items-start">
-      <div class="column" v-for="(column, colIndex) of board.columns" :key="colIndex">
+      <div :key="colIndex" class="column" v-for="(column, colIndex) of board.columns">
         <div class="flex items-center mb-2 font-bold">
           {{column.name}}
         </div>
         <div class="list-reset">
-          <div class="task" v-for="task of column.tasks" :key="task.id">
+          <div :key="taskIndex" class="task" v-for="(task, taskIndex) of column.tasks" @click="goToTask(task.id)">
             <span class="w-full flex-no-shrink font-bold">
               {{task.name}}
+              {{task.id}}
             </span>
-            <p v-if="task.description" class="w-full flex-no-shrink mt-1 text-sm">
+            <p class="w-full flex-no-shrink mt-1 text-sm" v-if="task.description">
               {{task.description}}
             </p>
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="task-bg" v-if="isTaskOpen">
+      <router-view/>
     </div>
   </div>
 </template>
@@ -24,7 +29,18 @@
   import { mapState } from 'vuex'
 
   export default {
-    computed: mapState(['board'])
+    computed: {
+      isTaskOpen () {
+        return this.$route.name === 'task'
+      },
+      ...mapState(['board'])
+    },
+    methods: {
+      goToTask(task){
+        console.log(task)
+        this.$router.push({name: 'task', params: {id: task}})
+      }
+    }
   }
 </script>
 
