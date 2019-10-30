@@ -7,7 +7,7 @@ export default {
       name: 'todo',
       tasks: [
         {
-          description: '',
+          description: 'This is the first task. Here i would want to create a project and provide a documentation for that project',
           name: 'first task',
           id: uuid(),
           userAssigned: null
