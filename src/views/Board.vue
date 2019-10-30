@@ -2,13 +2,13 @@
   <div class="board">
     <div class="flex flex-row items-start">
       <div :key="colIndex"
-           v-for="(column, colIndex) of board.columns"
-           draggable="true"
            @dragenter.prevent
            @dragover.prevent
            @dragstart.self="pickUpColumn($event, colIndex)"
            @drop="moveTaskOrColumn($event, column.tasks, colIndex)"
            class="column"
+           draggable="true"
+           v-for="(column, colIndex) of board.columns"
       >
         <div class="flex items-center mb-2 font-bold">
           {{column.name}}
@@ -16,10 +16,10 @@
         <div class="list-reset">
           <div :key="taskIndex"
                @click="goToTask(task.id)"
-               @dragstart="pickupTask($event, taskIndex, colIndex)"
                @dragenter.prevent
                @dragover.prevent
-               @drop.stop="moveTask($event, column.tasks, taskIndex)"
+               @dragstart="pickupTask($event, taskIndex, colIndex)"
+               @drop.stop="moveTaskOrColumn($event, column.tasks, colIndex, taskIndex)"
                class="task"
                draggable="true"
                v-for="(task, taskIndex) of column.tasks">
@@ -77,11 +77,11 @@
         e.dataTransfer.setData('from-column-index', fromColumnIndex)
         e.dataTransfer.setData('type', 'task')
       },
-      moveTaskOrColumn(e, toColumnTasks, toColumnIndex){
+      moveTaskOrColumn (e, toColumnTasks, toColumnIndex, toTaskIndex) {
         const type = e.dataTransfer.getData('type')
-        if(type === 'task'){
-          this.moveTask(e, toColumnTasks)
-        } else{
+        if (type === 'task') {
+          this.moveTask(e, toColumnTasks, toTaskIndex !== undefined ? toTaskIndex : toColumnTasks.length)
+        } else {
           this.moveColumn(e, toColumnIndex)
         }
       },
@@ -96,14 +96,14 @@
           toTaskIndex
         })
       },
-      moveColumn(e, toColumnIndex){
+      moveColumn (e, toColumnIndex) {
         const fromColumnIndex = e.dataTransfer.getData('from-column-index')
         this.$store.commit('MOVE_COLUMN', {
           fromColumnIndex,
           toColumnIndex
         })
       },
-      pickUpColumn(e, fromColIndex){
+      pickUpColumn (e, fromColIndex) {
         e.dataTransfer.effectAllowed = 'move'
         e.dataTransfer.dropEffect = 'move'
 
