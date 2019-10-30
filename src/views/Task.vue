@@ -1,11 +1,13 @@
 <template>
   <div class="task-view">
     <div class="flex flex-col flex-grow justify-between px-4">
-      <input :value="task.name" @change="updateTask($event, 'name')" class="p-2 w-full mr-2 flex-grow text-xl font-bold"
+      <input :value="task.name" @change="updateTask($event, 'name')" @keyup.enter="updateTask($event, 'name')"
+             class="p-2 w-full mr-2 flex-grow text-xl font-bold"
              type="text">
 
       <textarea :value="task.description"
                 @change="updateTask($event, 'description')"
+                @keyup.enter="updateTask($event, 'name')"
                 class="relative w-full bg-transparent px-2 border mt-2 h-64 border-none leading-normal"></textarea>
 
     </div>
@@ -23,7 +25,7 @@
       }
     },
     methods: {
-      updateTask(e, key){
+      updateTask (e, key) {
         this.$store.commit('UPDATE_TASK', {
           task: this.task,
           key,
