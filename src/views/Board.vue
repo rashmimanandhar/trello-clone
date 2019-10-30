@@ -34,6 +34,10 @@
                  placeholder="+ Enter new task"
                  type="text"/>
         </div>
+
+      </div>
+      <div class="column flex">
+        <input type="text" v-model="newColumnName" class="p-2 mr-2 flex-grow" placeholder="Enter a new column name"  @keyup.enter="createColumn">
       </div>
     </div>
 
@@ -47,6 +51,11 @@
   import { mapState } from 'vuex'
 
   export default {
+    data () {
+      return {
+        newColumnName: ''
+      }
+    },
     computed: {
       isTaskOpen () {
         return this.$route.name === 'task'
@@ -110,6 +119,12 @@
         //dataTransfer only allows to pass string
         e.dataTransfer.setData('from-column-index', fromColIndex)
         e.dataTransfer.setData('type', 'column')
+      },
+      createColumn(){
+        this.$store.commit('CREATE_COLUMN', {
+          name: this.newColumnName
+        })
+        this.newColumnName = ''
       }
     }
   }
