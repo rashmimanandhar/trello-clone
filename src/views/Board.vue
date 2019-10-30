@@ -9,7 +9,6 @@
           <div :key="taskIndex" class="task" v-for="(task, taskIndex) of column.tasks" @click="goToTask(task.id)">
             <span class="w-full flex-no-shrink font-bold">
               {{task.name}}
-              {{task.id}}
             </span>
             <p class="w-full flex-no-shrink mt-1 text-sm" v-if="task.description">
               {{task.description}}
@@ -19,7 +18,7 @@
       </div>
     </div>
 
-    <div class="task-bg" v-if="isTaskOpen">
+    <div class="task-bg" v-if="isTaskOpen" @click.self="close">
       <router-view/>
     </div>
   </div>
@@ -39,6 +38,9 @@
       goToTask(task){
         console.log(task)
         this.$router.push({name: 'task', params: {id: task}})
+      },
+      close() {
+        this.$router.push({name: 'board'})
       }
     }
   }
