@@ -12,13 +12,13 @@ export default new Vuex.Store({
   state: {
     board
   },
-  getters:{
-    getTask(state){
+  getters: {
+    getTask (state) {
       return (id) => {
-        for(const column of state.board.columns){
-          for (const task of column.tasks){
-            if(task.id === id){
-              return task;
+        for (const column of state.board.columns) {
+          for (const task of column.tasks) {
+            if (task.id === id) {
+              return task
             }
           }
         }
@@ -26,22 +26,22 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    CREATE_TASK(state, { tasks, name}) {
+    CREATE_TASK (state, { tasks, name }) {
       tasks.push({
         name,
         id: uuid(),
         description: ''
       })
     },
-    UPDATE_TASK(state, {task, key, value}){
+    UPDATE_TASK (state, { task, key, value }) {
       Vue.set(task, key, value)
     },
-    MOVE_TASK(state, { fromColumnTasks, toColumnTasks, taskIndex}){
-      const taskToMove = fromColumnTasks.splice(taskIndex, 1)[0]
-      toColumnTasks.push(taskToMove)
+    MOVE_TASK (state, { fromColumnTasks, toColumnTasks, fromTaskIndex, toTaskIndex }) {
+      const taskToMove = fromColumnTasks.splice(fromTaskIndex, 1)[0]
+      toColumnTasks.splice(toTaskIndex, 0, taskToMove)
     },
-    MOVE_COLUMN(state, { fromColumnIndex, toColumnIndex}){
-      const columnList =  state.board.columns
+    MOVE_COLUMN (state, { fromColumnIndex, toColumnIndex }) {
+      const columnList = state.board.columns
       const columnToMove = columnList.splice(fromColumnIndex, 1)[0]
       columnList.splice(toColumnIndex, 0, columnToMove)
     }

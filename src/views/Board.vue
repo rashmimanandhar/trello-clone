@@ -14,7 +14,12 @@
           {{column.name}}
         </div>
         <div class="list-reset">
-          <div :key="taskIndex" @click="goToTask(task.id)" @dragstart="pickupTask($event, taskIndex, colIndex)"
+          <div :key="taskIndex"
+               @click="goToTask(task.id)"
+               @dragstart="pickupTask($event, taskIndex, colIndex)"
+               @dragenter.prevent
+               @dragover.prevent
+               @drop.stop="moveTask($event, column.tasks, taskIndex)"
                class="task"
                draggable="true"
                v-for="(task, taskIndex) of column.tasks">
@@ -68,7 +73,7 @@
         e.dataTransfer.dropEffect = 'move'
 
         //dataTransfer only allows to pass string
-        e.dataTransfer.setData('task-index', taskIndex)
+        e.dataTransfer.setData('from-task-index', taskIndex)
         e.dataTransfer.setData('from-column-index', fromColumnIndex)
         e.dataTransfer.setData('type', 'task')
       },
@@ -80,14 +85,15 @@
           this.moveColumn(e, toColumnIndex)
         }
       },
-      moveTask (e, toColumnTasks) {
+      moveTask (e, toColumnTasks, toTaskIndex) {
         const fromColumnIndex = e.dataTransfer.getData('from-column-index')
         const fromColumnTasks = this.board.columns[fromColumnIndex].tasks
-        const taskIndex = e.dataTransfer.getData('task-index')
+        const fromTaskIndex = e.dataTransfer.getData('from-task-index')
         this.$store.commit('MOVE_TASK', {
           fromColumnTasks,
           toColumnTasks,
-          taskIndex
+          fromTaskIndex,
+          toTaskIndex
         })
       },
       moveColumn(e, toColumnIndex){
