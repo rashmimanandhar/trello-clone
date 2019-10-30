@@ -1,10 +1,15 @@
 <template>
   <div class="board">
     <div class="flex flex-row items-start">
-      <div :key="colIndex" class="column" v-for="(column, colIndex) of board.columns"
-      @drop="moveTask($event, column.tasks)"
-      @dragover.prevent
-      @dragenter.prevent>
+      <div :key="colIndex"
+           v-for="(column, colIndex) of board.columns"
+           draggable="true"
+           @dragenter.prevent
+           @dragover.prevent
+           @dragstart.self="pickUpColumn($event, colIndex)"
+           @drop="moveTaskOrColumn($event, column.tasks, colIndex)"
+           class="column"
+      >
         <div class="flex items-center mb-2 font-bold">
           {{column.name}}
         </div>
@@ -20,7 +25,8 @@
               {{task.description}}
             </p>
           </div>
-          <input @keyup.enter="createTask($event, column.tasks)" class="block p-2 w-full bg-transparent" placeholder="+ Enter new task"
+          <input @keyup.enter="createTask($event, column.tasks)" class="block p-2 w-full bg-transparent"
+                 placeholder="+ Enter new task"
                  type="text"/>
         </div>
       </div>
@@ -64,8 +70,17 @@
         //dataTransfer only allows to pass string
         e.dataTransfer.setData('task-index', taskIndex)
         e.dataTransfer.setData('from-column-index', fromColumnIndex)
+        e.dataTransfer.setData('type', 'task')
       },
-      moveTask (e, toColumnTasks){
+      moveTaskOrColumn(e, toColumnTasks, toColumnIndex){
+        const type = e.dataTransfer.getData('type')
+        if(type === 'task'){
+          this.moveTask(e, toColumnTasks)
+        } else{
+          this.moveColumn(e, toColumnIndex)
+        }
+      },
+      moveTask (e, toColumnTasks) {
         const fromColumnIndex = e.dataTransfer.getData('from-column-index')
         const fromColumnTasks = this.board.columns[fromColumnIndex].tasks
         const taskIndex = e.dataTransfer.getData('task-index')
@@ -74,8 +89,22 @@
           toColumnTasks,
           taskIndex
         })
-      }
+      },
+      moveColumn(e, toColumnIndex){
+        const fromColumnIndex = e.dataTransfer.getData('from-column-index')
+        this.$store.commit('MOVE_COLUMN', {
+          fromColumnIndex,
+          toColumnIndex
+        })
+      },
+      pickUpColumn(e, fromColIndex){
+        e.dataTransfer.effectAllowed = 'move'
+        e.dataTransfer.dropEffect = 'move'
 
+        //dataTransfer only allows to pass string
+        e.dataTransfer.setData('from-column-index', fromColIndex)
+        e.dataTransfer.setData('type', 'column')
+      }
     }
   }
 </script>
