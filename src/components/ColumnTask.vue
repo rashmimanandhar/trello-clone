@@ -1,26 +1,29 @@
 <template>
-  <div
-    @click="goToTask(task.id)"
-    @dragenter.prevent
-    @dragover.prevent
-    @dragstart="pickupTask($event, taskIndex, colIndex)"
-    @drop.stop="moveTaskOrColumn($event, column.tasks, colIndex, taskIndex)"
-    class="task"
-    draggable="true"
+  <AppDrop
+    @drop="moveTaskOrColumn"
   >
-            <span class="w-full flex-no-shrink font-bold">
-              {{task.name}}
-            </span>
-    <p class="w-full flex-no-shrink mt-1 text-sm" v-if="task.description">
-      {{task.description}}
-    </p>
-  </div>
+    <AppDrag :transferData="{type:'task', fromColumnIndex: colIndex, fromTaskIndex: taskIndex}"
+             @click="goToTask(task.id)"
+             class="task"
+    >
+      <span class="w-full flex-no-shrink font-bold">
+        {{task.name}}
+      </span>
+      <p class="w-full flex-no-shrink mt-1 text-sm" v-if="task.description">
+        {{task.description}}
+      </p>
+    </AppDrag>
+  </AppDrop>
+
 </template>
 
 <script>
   import movingColumnsAndTasksMixin from '../mixins/movingColumnsAndTasksMixin'
+  import AppDrop from './AppDrop'
+  import AppDrag from './AppDrag'
 
   export default {
+    components: { AppDrag, AppDrop },
     props: {
       task: {
         type: Object,

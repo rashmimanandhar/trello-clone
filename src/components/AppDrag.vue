@@ -1,7 +1,7 @@
 <template>
   <div
     draggable="true"
-    @dragstart="onDrag"
+    @dragstart.self="onDrag"
     @dragenter.prevent
     @dragover.prevent
   >
@@ -22,6 +22,7 @@
         e.dataTransfer.effectAllowed = 'move'
         e.dataTransfer.dropEffect = 'move'
         e.dataTransfer.setData('payload', JSON.stringify(this.transferData))
+        console.log(e.dataTransfer.getData('payload'))
       }
     }
   }
