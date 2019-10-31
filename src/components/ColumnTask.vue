@@ -1,39 +1,33 @@
 <template>
   <div
+    @click="goToTask(task.id)"
     @dragenter.prevent
     @dragover.prevent
-    @dragstart.self="pickUpColumn($event, colIndex)"
-    @drop="moveTaskOrColumn($event, column.tasks, colIndex)"
-    class="column"
+    @dragstart="pickupTask($event, taskIndex, colIndex)"
+    @drop.stop="moveTaskOrColumn($event, column.tasks, colIndex, taskIndex)"
+    class="task"
     draggable="true"
   >
-    <div class="flex items-center mb-2 font-bold">
-      {{column.name}}
-    </div>
-    <div class="list-reset">
-      <ColumnTask
-        :colIndex="colIndex"
-        :column="column"
-        :key="taskIndex"
-        :task="task"
-        :taskIndex="taskIndex"
-        :board="board"
-        v-for="(task, taskIndex) of column.tasks"></ColumnTask>
-      <input @keyup.enter="createTask($event, column.tasks)" class="block p-2 w-full bg-transparent"
-             placeholder="+ Enter new task"
-             type="text"/>
-    </div>
-
+            <span class="w-full flex-no-shrink font-bold">
+              {{task.name}}
+            </span>
+    <p class="w-full flex-no-shrink mt-1 text-sm" v-if="task.description">
+      {{task.description}}
+    </p>
   </div>
 </template>
 
 <script>
-
-  import ColumnTask from './ColumnTask'
-
   export default {
-    components: { ColumnTask },
     props: {
+      task: {
+        type: Object,
+        required: true
+      },
+      taskIndex: {
+        type: Number,
+        required: true
+      },
       column: {
         type: Object,
         required: true
@@ -47,12 +41,20 @@
         required: true
       }
     },
-    computed: {
-      name () {
-        return this.data
-      },
-    },
     methods: {
+      pickupTask (e, taskIndex, fromColumnIndex) {
+        e.dataTransfer.effectAllowed = 'move'
+        e.dataTransfer.dropEffect = 'move'
+
+        //dataTransfer only allows to pass string
+        e.dataTransfer.setData('from-task-index', taskIndex)
+        e.dataTransfer.setData('from-column-index', fromColumnIndex)
+        e.dataTransfer.setData('type', 'task')
+      },
+      goToTask (task) {
+        console.log(task)
+        this.$router.push({ name: 'task', params: { id: task } })
+      },
       moveTaskOrColumn (e, toColumnTasks, toColumnIndex, toTaskIndex) {
         const type = e.dataTransfer.getData('type')
         if (type === 'task') {
@@ -79,30 +81,10 @@
           toColumnIndex
         })
       },
-      pickUpColumn (e, fromColIndex) {
-        e.dataTransfer.effectAllowed = 'move'
-        e.dataTransfer.dropEffect = 'move'
-
-        //dataTransfer only allows to pass string
-        e.dataTransfer.setData('from-column-index', fromColIndex)
-        e.dataTransfer.setData('type', 'column')
-      },
-      createTask (e, tasks) {
-        this.$store.commit('CREATE_TASK', {
-          tasks,
-          name: e.target.value
-        })
-        e.target.value = ''
-      }
-
     }
   }
 </script>
 
-<style lang="css">
-  .column {
-    @apply bg-grey-light p-2 mr-4 text-left shadow rounded;
-    min-width: 350px;
-  }
+<style scoped>
 
 </style>
