@@ -14,12 +14,11 @@ export default {
     }
   },
   methods:{
-    moveTaskOrColumn (e, toColumnTasks, toColumnIndex, toTaskIndex) {
-      const type = e.dataTransfer.getData('type')
-      if (type === 'task') {
-        this.moveTask(e, toColumnTasks, toTaskIndex !== undefined ? toTaskIndex : toColumnTasks.length)
+    moveTaskOrColumn (transferData) {
+      if (transferData.type === 'task') {
+        this.moveTask(transferData)
       } else {
-        this.moveColumn(e, toColumnIndex)
+        this.moveColumn(transferData)
       }
     },
     moveTask (e, toColumnTasks, toTaskIndex) {
@@ -33,11 +32,10 @@ export default {
         toTaskIndex
       })
     },
-    moveColumn (e, toColumnIndex) {
-      const fromColumnIndex = e.dataTransfer.getData('from-column-index')
+    moveColumn ({fromColumnIndex}) {
       this.$store.commit('MOVE_COLUMN', {
         fromColumnIndex,
-        toColumnIndex
+        toColumnIndex: this.colIndex
       })
     },
   }
